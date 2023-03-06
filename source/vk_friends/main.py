@@ -1,8 +1,26 @@
 import argparse
+import vk_api
 
-def main(token, user_id, output_format, output_file):
-    # Здесь должен быть код для получения списка друзей из VK и записи в файл с указанным форматом
-    pass
+
+def main(token, user_id, output_format='csv', output_file='reports'):
+
+    # авторизация в API VK
+    vk_session = vk_api.VkApi(token=token)
+
+    # получение списка друзей пользователя
+    response = vk_session.method('friends.get', {'user_id': f'{user_id}', 'fields': 'sex,bdate,city,country'})
+
+    # обработка JSON-ответа
+    for friend in response['items']:
+        print(f"ID: {friend['id']}")
+        print(f"Имя: {friend['first_name']}")
+        print(f"Фамилия: {friend['last_name']}")
+        print(f"Пол: {'Женский' if friend['sex'] == 1 else 'Мужской'}")
+        print(f"Дата рождения: {friend.get('bdate', 'Не указана')}")
+        print(f"Город: {friend['city']['title'] if 'city' in friend else 'Не указан'}")
+        print(f"Страна: {friend['country']['title'] if 'country' in friend else 'Не указана'}")
+        print("-" * 50)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='VK friends list generator')
